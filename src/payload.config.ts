@@ -1,5 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -7,7 +8,33 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Branches } from './collections/Branches'
+import { Categories } from './collections/Categories'
+import { Products } from './collections/Products'
+import { BranchProducts } from './collections/BranchProducts'
+import { Addresses } from './collections/Addresses'
+import { Orders } from './collections/Orders'
+import { Payments } from './collections/Payments'
+import { Deliveries } from './collections/Deliveries'
+import { Reviews } from './collections/Reviews'
+
+import { SiteSettings } from './globals/SiteSettings'
+import { Homepage } from './globals/Homepage'
+
 import { allowedOrigins } from './utils/cors/corsHandler'
+
+import { bkashInitiate } from './endpoints/payment/bkash/initiate'
+import { bkashCallback } from './endpoints/payment/bkash/callback'
+import { bkashVerify } from './endpoints/payment/bkash/verify'
+import { nagadInitiate } from './endpoints/payment/nagad/initiate'
+import { nagadCallback } from './endpoints/payment/nagad/callback'
+import { nagadVerify } from './endpoints/payment/nagad/verify'
+import { sslInitiate } from './endpoints/payment/sslcommerz/initiate'
+import { sslSuccess } from './endpoints/payment/sslcommerz/success'
+import { sslFail } from './endpoints/payment/sslcommerz/fail'
+import { sslCancel } from './endpoints/payment/sslcommerz/cancel'
+import { trackOrder } from './endpoints/orders/track'
+import { revalidateWebhook } from './endpoints/webhooks/revalidate'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -18,10 +45,9 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    // Add your own logo and icon here
     components: {
       beforeNavLinks: ['./components/DashboardNavLink'],
-      // beforeDashboard: ['./components/DeliveryReportPage#DeliveryReportPage'],
+      beforeDashboard: ['./components/DashboardWidget#default'],
       afterLogin: ['./components/PoweredBy'],
       logout: {
         Button: './components/PoweredByAfterLogout',
@@ -31,7 +57,6 @@ export default buildConfig({
         Logo: '/graphics/Logo/index.tsx#Logo',
       },
     },
-    // Add your own meta data here
     meta: {
       description: 'Yummy Admin Panel',
       icons: [
@@ -43,8 +68,27 @@ export default buildConfig({
       ],
       titleSuffix: 'Yummy - Happiness in every bite',
     },
+    livePreview: {
+      breakpoints: [
+        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
+        { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
+      ],
+    },
   },
-  collections: [Users, Media],
+  collections: [
+    Users,
+    Media,
+    Branches,
+    Categories,
+    Products,
+    BranchProducts,
+    Addresses,
+    Orders,
+    Payments,
+    Deliveries,
+    Reviews,
+  ],
+  globals: [SiteSettings, Homepage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -53,13 +97,41 @@ export default buildConfig({
   graphQL: {
     disable: true,
   },
+  endpoints: [
+    { path: '/payment/bkash/initiate', method: 'post', handler: bkashInitiate },
+    { path: '/payment/bkash/callback', method: 'get', handler: bkashCallback },
+    { path: '/payment/bkash/verify', method: 'post', handler: bkashVerify },
+    { path: '/payment/nagad/initiate', method: 'post', handler: nagadInitiate },
+    { path: '/payment/nagad/callback', method: 'post', handler: nagadCallback },
+    { path: '/payment/nagad/verify', method: 'post', handler: nagadVerify },
+    { path: '/payment/sslcommerz/initiate', method: 'post', handler: sslInitiate },
+    { path: '/payment/sslcommerz/success', method: 'post', handler: sslSuccess },
+    { path: '/payment/sslcommerz/fail', method: 'post', handler: sslFail },
+    { path: '/payment/sslcommerz/cancel', method: 'post', handler: sslCancel },
+    { path: '/orders/track', method: 'get', handler: trackOrder },
+    { path: '/webhooks/revalidate', method: 'post', handler: revalidateWebhook },
+  ],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    s3Storage({
+      collections: { media: true },
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        endpoint: process.env.S3_ENDPOINT,
+        region: process.env.S3_REGION || 'auto',
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        },
+        forcePathStyle: true,
+      },
+    }),
+  ],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   cookiePrefix: 'yummy',

@@ -2,8 +2,12 @@
 // This echoes back the origin if it's in our allow list and enables cookies
 export const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001',
   'https://yummy.codemonks.dev',
   'https://yummy-admin.codemonks.dev',
+  'https://cms.yummybakery.com',
+  'https://www.yummybakery.com',
+  'https://yummybakery.com',
 ]
 
 export const buildCorsHeaders = (request?: Request) => {

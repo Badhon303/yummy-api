@@ -69,6 +69,15 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    branches: Branch;
+    categories: Category;
+    products: Product;
+    'branch-products': BranchProduct;
+    addresses: Address;
+    orders: Order;
+    payments: Payment;
+    deliveries: Delivery;
+    reviews: Review;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +87,15 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    branches: BranchesSelect<false> | BranchesSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'branch-products': BranchProductsSelect<false> | BranchProductsSelect<true>;
+    addresses: AddressesSelect<false> | AddressesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    payments: PaymentsSelect<false> | PaymentsSelect<true>;
+    deliveries: DeliveriesSelect<false> | DeliveriesSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +105,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+    homepage: Homepage;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -123,6 +147,9 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name: string;
+  phone?: string | null;
+  role?: ('admin' | 'staff' | 'customer') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -160,6 +187,248 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches".
+ */
+export interface Branch {
+  id: number;
+  name: string;
+  location: string;
+  phone: string;
+  openingHours?: {
+    open?: string | null;
+    close?: string | null;
+  };
+  googleMapsUrl?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  name: string;
+  /**
+   * URL-friendly identifier. Auto-generated from name.
+   */
+  slug: string;
+  category: number | Category;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  shortDescription?: string | null;
+  basePrice: number;
+  isNew?: boolean | null;
+  isBestseller?: boolean | null;
+  isActive?: boolean | null;
+  images?:
+    | {
+        image: number | Media;
+        alt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  averageRating?: number | null;
+  reviewCount?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manages per-branch stock levels for each product.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branch-products".
+ */
+export interface BranchProduct {
+  id: number;
+  branch: number | Branch;
+  product: number | Product;
+  stockQuantity: number;
+  lowStockThreshold: number;
+  isAvailable?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: number;
+  user: number | User;
+  recipientName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string | null;
+  city: string;
+  area?: string | null;
+  postalCode?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  /**
+   * Auto-generated: YMY-YYYYMMDD-XXXX
+   */
+  orderNumber?: string | null;
+  user?: (number | null) | User;
+  /**
+   * Required for guest orders (when no user is associated)
+   */
+  guestEmail?: string | null;
+  guestName?: string | null;
+  branch: number | Branch;
+  shippingAddress: number | Address;
+  orderStatus:
+    | 'pending'
+    | 'confirmed'
+    | 'preparing'
+    | 'out_for_delivery'
+    | 'ready_for_pickup'
+    | 'delivered'
+    | 'cancelled';
+  orderType: 'delivery' | 'pickup';
+  items: {
+    product: number | Product;
+    productName?: string | null;
+    quantity: number;
+    unitPrice: number;
+    subtotal?: number | null;
+    id?: string | null;
+  }[];
+  subtotal: number;
+  deliveryFee?: number | null;
+  totalAmount: number;
+  notes?: string | null;
+  paymentMethod: 'cod' | 'bkash' | 'nagad' | 'sslcommerz';
+  paymentStatus: 'unpaid' | 'pending_gateway' | 'paid' | 'failed' | 'refunded';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments".
+ */
+export interface Payment {
+  id: number;
+  order: number | Order;
+  gateway: 'cod' | 'bkash' | 'nagad' | 'sslcommerz';
+  status: 'pending' | 'initiated' | 'success' | 'failed' | 'cancelled' | 'refunded';
+  amount: number;
+  currency?: string | null;
+  transactionId?: string | null;
+  gatewayRefId?: string | null;
+  gatewayOrderId?: string | null;
+  merchantInvoiceNumber?: string | null;
+  rawResponse?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  customerMsisdn?: string | null;
+  initiatedAt?: string | null;
+  completedAt?: string | null;
+  failureReason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveries".
+ */
+export interface Delivery {
+  id: number;
+  order: number | Order;
+  deliveryPersonName?: string | null;
+  deliveryPersonPhone?: string | null;
+  deliveryStatus: 'assigning' | 'in_transit' | 'delivered' | 'failed';
+  estimatedDeliveryTime?: string | null;
+  actualDeliveryTime?: string | null;
+  trackingUrl?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  product: number | Product;
+  user?: (number | null) | User;
+  guestName?: string | null;
+  guestEmail?: string | null;
+  rating: number;
+  comment?: string | null;
+  isApproved?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -192,6 +461,42 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'branches';
+        value: number | Branch;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'branch-products';
+        value: number | BranchProduct;
+      } | null)
+    | ({
+        relationTo: 'addresses';
+        value: number | Address;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'payments';
+        value: number | Payment;
+      } | null)
+    | ({
+        relationTo: 'deliveries';
+        value: number | Delivery;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -240,6 +545,9 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -274,6 +582,211 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches_select".
+ */
+export interface BranchesSelect<T extends boolean = true> {
+  name?: T;
+  location?: T;
+  phone?: T;
+  openingHours?:
+    | T
+    | {
+        open?: T;
+        close?: T;
+      };
+  googleMapsUrl?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  category?: T;
+  description?: T;
+  shortDescription?: T;
+  basePrice?: T;
+  isNew?: T;
+  isBestseller?: T;
+  isActive?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        id?: T;
+      };
+  averageRating?: T;
+  reviewCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branch-products_select".
+ */
+export interface BranchProductsSelect<T extends boolean = true> {
+  branch?: T;
+  product?: T;
+  stockQuantity?: T;
+  lowStockThreshold?: T;
+  isAvailable?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses_select".
+ */
+export interface AddressesSelect<T extends boolean = true> {
+  user?: T;
+  recipientName?: T;
+  phone?: T;
+  addressLine1?: T;
+  addressLine2?: T;
+  city?: T;
+  area?: T;
+  postalCode?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  user?: T;
+  guestEmail?: T;
+  guestName?: T;
+  branch?: T;
+  shippingAddress?: T;
+  orderStatus?: T;
+  orderType?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        productName?: T;
+        quantity?: T;
+        unitPrice?: T;
+        subtotal?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  deliveryFee?: T;
+  totalAmount?: T;
+  notes?: T;
+  paymentMethod?: T;
+  paymentStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments_select".
+ */
+export interface PaymentsSelect<T extends boolean = true> {
+  order?: T;
+  gateway?: T;
+  status?: T;
+  amount?: T;
+  currency?: T;
+  transactionId?: T;
+  gatewayRefId?: T;
+  gatewayOrderId?: T;
+  merchantInvoiceNumber?: T;
+  rawResponse?: T;
+  customerMsisdn?: T;
+  initiatedAt?: T;
+  completedAt?: T;
+  failureReason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveries_select".
+ */
+export interface DeliveriesSelect<T extends boolean = true> {
+  order?: T;
+  deliveryPersonName?: T;
+  deliveryPersonPhone?: T;
+  deliveryStatus?: T;
+  estimatedDeliveryTime?: T;
+  actualDeliveryTime?: T;
+  trackingUrl?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  product?: T;
+  user?: T;
+  guestName?: T;
+  guestEmail?: T;
+  rating?: T;
+  comment?: T;
+  isApproved?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -314,6 +827,139 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  siteName?: string | null;
+  tagline?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  logo?: (number | null) | Media;
+  favicon?: (number | null) | Media;
+  socialLinks?: {
+    facebook?: string | null;
+    instagram?: string | null;
+  };
+  footerText?: string | null;
+  /**
+   * Standard delivery fee in BDT
+   */
+  deliveryFee?: number | null;
+  /**
+   * Order amount above which delivery is free (BDT)
+   */
+  freeDeliveryThreshold?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: number;
+  hero?: {
+    headline?: string | null;
+    subheadline?: string | null;
+    backgroundImage?: (number | null) | Media;
+    /**
+     * Optional video URL
+     */
+    backgroundVideo?: string | null;
+  };
+  featuredCategories?: (number | Category)[] | null;
+  aboutTeaser?: {
+    heading?: string | null;
+    body?: string | null;
+    image?: (number | null) | Media;
+    ctaText?: string | null;
+  };
+  testimonials?:
+    | {
+        quote: string;
+        author: string;
+        location?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  stats?: {
+    happyCustomers?: number | null;
+    bakeryItems?: number | null;
+    cityOutlets?: number | null;
+    yearsOfBaking?: number | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  tagline?: T;
+  phone?: T;
+  email?: T;
+  logo?: T;
+  favicon?: T;
+  socialLinks?:
+    | T
+    | {
+        facebook?: T;
+        instagram?: T;
+      };
+  footerText?: T;
+  deliveryFee?: T;
+  freeDeliveryThreshold?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        headline?: T;
+        subheadline?: T;
+        backgroundImage?: T;
+        backgroundVideo?: T;
+      };
+  featuredCategories?: T;
+  aboutTeaser?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        image?: T;
+        ctaText?: T;
+      };
+  testimonials?:
+    | T
+    | {
+        quote?: T;
+        author?: T;
+        location?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        happyCustomers?: T;
+        bakeryItems?: T;
+        cityOutlets?: T;
+        yearsOfBaking?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
