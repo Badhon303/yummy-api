@@ -7,6 +7,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { allowedOrigins } from './utils/cors/corsHandler'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,12 +18,40 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // Add your own logo and icon here
+    components: {
+      beforeNavLinks: ['./components/DashboardNavLink'],
+      // beforeDashboard: ['./components/DeliveryReportPage#DeliveryReportPage'],
+      afterLogin: ['./components/PoweredBy'],
+      logout: {
+        Button: './components/PoweredByAfterLogout',
+      },
+      graphics: {
+        Icon: '/graphics/Icon/index.tsx#Icon',
+        Logo: '/graphics/Logo/index.tsx#Logo',
+      },
+    },
+    // Add your own meta data here
+    meta: {
+      description: 'Yummy Admin Panel',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          url: '/assets/favicon.ico',
+        },
+      ],
+      titleSuffix: 'Yummy - Happiness in every bite',
+    },
   },
   collections: [Users, Media],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  graphQL: {
+    disable: true,
   },
   db: postgresAdapter({
     pool: {
@@ -31,4 +60,7 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
+  cookiePrefix: 'yummy',
 })
