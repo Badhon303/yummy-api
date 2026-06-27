@@ -2,6 +2,13 @@ import type { CollectionConfig } from 'payload'
 
 export const Deliveries: CollectionConfig = {
   slug: 'deliveries',
+  labels: {
+    singular: '🚚 Delivery',
+    plural: '🚚 Deliveries',
+  },
+  admin: {
+    group: '🦖 Order Management',
+  },
   access: {
     read: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'staff',
     create: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'staff',

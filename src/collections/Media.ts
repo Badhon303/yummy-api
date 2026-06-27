@@ -5,6 +5,13 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
+  labels: {
+    singular: '🏜️ Media',
+    plural: '🏜️ Media',
+  },
+  admin: {
+    group: '⚙️ Settings',
+  },
   upload: {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
     imageSizes: [

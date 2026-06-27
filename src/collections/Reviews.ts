@@ -2,6 +2,11 @@ import type { CollectionConfig } from 'payload'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
+  labels: {
+    singular: '🦄 Review',
+    plural: '🦄 Reviews',
+  },
+  admin: { useAsTitle: 'user', group: '😎 User Management' },
   access: {
     create: () => true,
     read: ({ req }) => {
@@ -23,15 +28,11 @@ export const Reviews: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ doc, req }) => {
-        const productId =
-          typeof doc.product === 'object' ? doc.product.id : doc.product
+        const productId = typeof doc.product === 'object' ? doc.product.id : doc.product
         const result = await req.payload.find({
           collection: 'reviews',
           where: {
-            and: [
-              { product: { equals: productId } },
-              { isApproved: { equals: true } },
-            ],
+            and: [{ product: { equals: productId } }, { isApproved: { equals: true } }],
           },
           limit: 0,
         })

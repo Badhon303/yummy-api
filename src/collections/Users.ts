@@ -6,9 +6,11 @@ export const Users: CollectionConfig = {
     tokenExpiration: 60 * 60 * 24 * 7,
     cookies: { secure: process.env.NODE_ENV === 'production' },
   },
-  admin: {
-    useAsTitle: 'email',
+  labels: {
+    singular: '🐸 User',
+    plural: '🐸 Users',
   },
+  admin: { useAsTitle: 'email', group: '😎 User Management' },
   access: {
     read: ({ req }) => {
       if (req.user?.role === 'admin' || req.user?.role === 'staff') return true

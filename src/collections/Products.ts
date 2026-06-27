@@ -2,7 +2,11 @@ import type { CollectionConfig } from 'payload'
 
 export const Products: CollectionConfig = {
   slug: 'products',
-  admin: { useAsTitle: 'name' },
+  labels: {
+    singular: '🍕 Product',
+    plural: '🍕 Products',
+  },
+  admin: { useAsTitle: 'name', group: '🏪 Product Management' },
   access: {
     read: () => true,
     create: ({ req }) => req.user?.role === 'admin',

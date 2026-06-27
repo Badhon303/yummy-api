@@ -2,9 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 export const BranchProducts: CollectionConfig = {
   slug: 'branch-products',
+  labels: {
+    singular: '🧩 Branch Product',
+    plural: '🧩 Branch Products',
+  },
   admin: {
     useAsTitle: 'id',
     description: 'Manages per-branch stock levels for each product.',
+    group: '🏪 Product Management',
   },
   access: {
     read: () => true,

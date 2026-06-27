@@ -2,6 +2,11 @@ import type { CollectionConfig } from 'payload'
 
 export const Addresses: CollectionConfig = {
   slug: 'addresses',
+  labels: {
+    singular: '📋 Address',
+    plural: '📋 Addresses',
+  },
+  admin: { useAsTitle: 'user', group: '😎 User Management' },
   access: {
     create: () => true,
     read: ({ req }) => {

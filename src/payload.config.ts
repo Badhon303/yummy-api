@@ -18,8 +18,8 @@ import { Payments } from './collections/Payments'
 import { Deliveries } from './collections/Deliveries'
 import { Reviews } from './collections/Reviews'
 
-import { SiteSettings } from './globals/SiteSettings'
-import { Homepage } from './globals/Homepage'
+// import { SiteSettings } from './globals/SiteSettings'
+// import { Homepage } from './globals/Homepage'
 
 import { allowedOrigins } from './utils/cors/corsHandler'
 
@@ -88,7 +88,7 @@ export default buildConfig({
     Deliveries,
     Reviews,
   ],
-  globals: [SiteSettings, Homepage],
+  // globals: [SiteSettings, Homepage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -105,14 +105,8 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {
-    'site-settings': SiteSetting;
-    homepage: Homepage;
-  };
-  globalsSelect: {
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    homepage: HomepageSelect<false> | HomepageSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -827,139 +821,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
- */
-export interface SiteSetting {
-  id: number;
-  siteName?: string | null;
-  tagline?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  logo?: (number | null) | Media;
-  favicon?: (number | null) | Media;
-  socialLinks?: {
-    facebook?: string | null;
-    instagram?: string | null;
-  };
-  footerText?: string | null;
-  /**
-   * Standard delivery fee in BDT
-   */
-  deliveryFee?: number | null;
-  /**
-   * Order amount above which delivery is free (BDT)
-   */
-  freeDeliveryThreshold?: number | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage".
- */
-export interface Homepage {
-  id: number;
-  hero?: {
-    headline?: string | null;
-    subheadline?: string | null;
-    backgroundImage?: (number | null) | Media;
-    /**
-     * Optional video URL
-     */
-    backgroundVideo?: string | null;
-  };
-  featuredCategories?: (number | Category)[] | null;
-  aboutTeaser?: {
-    heading?: string | null;
-    body?: string | null;
-    image?: (number | null) | Media;
-    ctaText?: string | null;
-  };
-  testimonials?:
-    | {
-        quote: string;
-        author: string;
-        location?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  stats?: {
-    happyCustomers?: number | null;
-    bakeryItems?: number | null;
-    cityOutlets?: number | null;
-    yearsOfBaking?: number | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
- */
-export interface SiteSettingsSelect<T extends boolean = true> {
-  siteName?: T;
-  tagline?: T;
-  phone?: T;
-  email?: T;
-  logo?: T;
-  favicon?: T;
-  socialLinks?:
-    | T
-    | {
-        facebook?: T;
-        instagram?: T;
-      };
-  footerText?: T;
-  deliveryFee?: T;
-  freeDeliveryThreshold?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage_select".
- */
-export interface HomepageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        headline?: T;
-        subheadline?: T;
-        backgroundImage?: T;
-        backgroundVideo?: T;
-      };
-  featuredCategories?: T;
-  aboutTeaser?:
-    | T
-    | {
-        heading?: T;
-        body?: T;
-        image?: T;
-        ctaText?: T;
-      };
-  testimonials?:
-    | T
-    | {
-        quote?: T;
-        author?: T;
-        location?: T;
-        id?: T;
-      };
-  stats?:
-    | T
-    | {
-        happyCustomers?: T;
-        bakeryItems?: T;
-        cityOutlets?: T;
-        yearsOfBaking?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

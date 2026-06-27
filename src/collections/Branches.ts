@@ -2,7 +2,11 @@ import type { CollectionConfig } from 'payload'
 
 export const Branches: CollectionConfig = {
   slug: 'branches',
-  admin: { useAsTitle: 'name' },
+  labels: {
+    singular: '✨ Branch',
+    plural: '✨ Branches',
+  },
+  admin: { useAsTitle: 'name', group: '⚙️ Settings' },
   access: {
     read: () => true,
     create: ({ req }) => req.user?.role === 'admin',

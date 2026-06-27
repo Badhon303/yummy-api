@@ -2,9 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
+  labels: {
+    singular: '🎯 Order',
+    plural: '🎯 Orders',
+  },
   admin: {
     useAsTitle: 'orderNumber',
     defaultColumns: ['orderNumber', 'orderStatus', 'totalAmount', 'createdAt'],
+    group: '🦖 Order Management',
   },
   access: {
     create: () => true,

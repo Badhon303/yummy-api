@@ -2,7 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 export const Payments: CollectionConfig = {
   slug: 'payments',
-  admin: { useAsTitle: 'transactionId' },
+  labels: {
+    singular: '💳 Payment',
+    plural: '💳 Payments',
+  },
+  admin: {
+    useAsTitle: 'transactionId',
+    group: '🦖 Order Management',
+  },
   access: {
     read: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'staff',
     create: () => true,
