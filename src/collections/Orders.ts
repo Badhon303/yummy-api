@@ -43,7 +43,7 @@ export const Orders: CollectionConfig = {
       },
     },
     { name: 'guestName', type: 'text' },
-    { name: 'branch', type: 'relationship', relationTo: 'branches', required: true },
+    { name: 'branch', type: 'relationship', relationTo: 'outlets', required: true },
     {
       name: 'shippingAddress',
       type: 'relationship',

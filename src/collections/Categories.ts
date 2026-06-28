@@ -22,6 +22,7 @@ export const Categories: CollectionConfig = {
       unique: true,
       admin: { readOnly: true },
     },
+    { name: 'image', type: 'upload', relationTo: 'media' },
     { name: 'description', type: 'textarea' },
     { name: 'sortOrder', type: 'number', unique: true },
   ],

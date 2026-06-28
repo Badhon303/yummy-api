@@ -20,22 +20,72 @@ export const Products: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      admin: { description: 'URL-friendly identifier. Auto-generated from name.' },
+      admin: { readOnly: true, description: 'URL-friendly identifier. Auto-generated from name.' },
     },
     { name: 'category', type: 'relationship', relationTo: 'categories', required: true },
-    { name: 'description', type: 'richText' },
-    { name: 'shortDescription', type: 'textarea' },
+    { name: 'description', type: 'text' },
+    { name: 'shortDescription', type: 'text' },
     { name: 'basePrice', type: 'number', required: true, min: 0 },
-    { name: 'isNew', type: 'checkbox', defaultValue: false },
-    { name: 'isBestseller', type: 'checkbox', defaultValue: false },
-    { name: 'isActive', type: 'checkbox', defaultValue: true },
     {
-      name: 'images',
+      type: 'row',
+      fields: [
+        { name: 'isNew', type: 'checkbox', defaultValue: false },
+        { name: 'isBestseller', type: 'checkbox', defaultValue: false },
+        { name: 'isActive', type: 'checkbox', defaultValue: true },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'image',
+      fields: [
+        {
+          name: 'localImage',
+          type: 'upload',
+          relationTo: 'media',
+        },
+        {
+          name: 'externalImage',
+          type: 'text',
+        },
+      ],
+    },
+    {
+      name: 'gallery',
+      type: 'group',
+      fields: [
+        {
+          name: 'localImage',
+          type: 'upload',
+          relationTo: 'media',
+          hasMany: true,
+        },
+        {
+          name: 'externalImages',
+          type: 'array',
+          minRows: 1,
+          fields: [{ name: 'url', type: 'text', required: true }],
+        },
+      ],
+    },
+    {
+      name: 'tags',
+      type: 'array',
+      minRows: 1,
+      fields: [{ name: 'tag', type: 'text', required: true }],
+    },
+    {
+      name: 'ingredients',
+      type: 'array',
+      minRows: 1,
+      fields: [{ name: 'ingredient', type: 'text', required: true }],
+    },
+    {
+      name: 'variants',
       type: 'array',
       minRows: 1,
       fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
-        { name: 'alt', type: 'text' },
+        { name: 'variant', type: 'text', required: true },
+        { name: 'price', type: 'number', required: true, min: 0 },
       ],
     },
     {

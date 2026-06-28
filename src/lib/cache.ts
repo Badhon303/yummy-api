@@ -2,7 +2,7 @@ import { getRedis } from './redis'
 
 export const CacheKeys = {
   categories: () => 'categories',
-  branches: () => 'branches',
+  outlets: () => 'outlets',
   products: (branchId?: string) => `products:${branchId ?? 'all'}`,
   product: (slug: string) => `product:${slug}`,
   bestsellers: () => 'products:bestsellers',
@@ -14,7 +14,7 @@ export const CacheKeys = {
 
 export const TTL = {
   categories: 3600,
-  branches: 3600,
+  outlets: 3600,
   products: 300,
   product: 300,
   bestsellers: 600,

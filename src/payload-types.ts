@@ -69,7 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    branches: Branch;
+    outlets: Outlet;
     categories: Category;
     products: Product;
     'branch-products': BranchProduct;
@@ -87,7 +87,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    branches: BranchesSelect<false> | BranchesSelect<true>;
+    outlets: OutletsSelect<false> | OutletsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'branch-products': BranchProductsSelect<false> | BranchProductsSelect<true>;
@@ -210,19 +210,27 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "branches".
+ * via the `definition` "outlets".
  */
-export interface Branch {
+export interface Outlet {
   id: number;
   name: string;
-  location: string;
+  area: string;
+  city: string;
+  address: string;
   phone: string;
   openingHours?: {
     open?: string | null;
     close?: string | null;
   };
-  googleMapsUrl?: string | null;
-  isActive?: boolean | null;
+  lat: number;
+  lng: number;
+  image?: {
+    localImage?: (number | null) | Media;
+    externalImage?: string | null;
+  };
+  supportsDelivery?: boolean | null;
+  supportsPickup?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -234,6 +242,7 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
+  image?: (number | null) | Media;
   description?: string | null;
   sortOrder?: number | null;
   updatedAt: string;
@@ -251,30 +260,41 @@ export interface Product {
    */
   slug: string;
   category: number | Category;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   shortDescription?: string | null;
   basePrice: number;
   isNew?: boolean | null;
   isBestseller?: boolean | null;
   isActive?: boolean | null;
-  images?:
+  image?: {
+    localImage?: (number | null) | Media;
+    externalImage?: string | null;
+  };
+  gallery?: {
+    localImage?: (number | Media)[] | null;
+    externalImages?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  tags?:
     | {
-        image: number | Media;
-        alt?: string | null;
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  ingredients?:
+    | {
+        ingredient: string;
+        id?: string | null;
+      }[]
+    | null;
+  variants?:
+    | {
+        variant: string;
+        price: number;
         id?: string | null;
       }[]
     | null;
@@ -291,10 +311,20 @@ export interface Product {
  */
 export interface BranchProduct {
   id: number;
-  branch: number | Branch;
+  branch: number | Outlet;
   product: number | Product;
+  /**
+   * Current stock on hand. Use "Adjust Stock" below to change this value.
+   */
   stockQuantity: number;
+  /**
+   * Enter a positive number to add stock or a negative number to remove stock. This resets to 0 after saving.
+   */
+  adjustStock?: number | null;
   lowStockThreshold: number;
+  /**
+   * Automatically set based on whether stock is available.
+   */
   isAvailable?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -332,7 +362,7 @@ export interface Order {
    */
   guestEmail?: string | null;
   guestName?: string | null;
-  branch: number | Branch;
+  branch: number | Outlet;
   shippingAddress: number | Address;
   orderStatus:
     | 'pending'
@@ -457,8 +487,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'branches';
-        value: number | Branch;
+        relationTo: 'outlets';
+        value: number | Outlet;
       } | null)
     | ({
         relationTo: 'categories';
@@ -613,11 +643,13 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "branches_select".
+ * via the `definition` "outlets_select".
  */
-export interface BranchesSelect<T extends boolean = true> {
+export interface OutletsSelect<T extends boolean = true> {
   name?: T;
-  location?: T;
+  area?: T;
+  city?: T;
+  address?: T;
   phone?: T;
   openingHours?:
     | T
@@ -625,8 +657,16 @@ export interface BranchesSelect<T extends boolean = true> {
         open?: T;
         close?: T;
       };
-  googleMapsUrl?: T;
-  isActive?: T;
+  lat?: T;
+  lng?: T;
+  image?:
+    | T
+    | {
+        localImage?: T;
+        externalImage?: T;
+      };
+  supportsDelivery?: T;
+  supportsPickup?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -637,6 +677,7 @@ export interface BranchesSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  image?: T;
   description?: T;
   sortOrder?: T;
   updatedAt?: T;
@@ -656,11 +697,40 @@ export interface ProductsSelect<T extends boolean = true> {
   isNew?: T;
   isBestseller?: T;
   isActive?: T;
-  images?:
+  image?:
     | T
     | {
-        image?: T;
-        alt?: T;
+        localImage?: T;
+        externalImage?: T;
+      };
+  gallery?:
+    | T
+    | {
+        localImage?: T;
+        externalImages?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  ingredients?:
+    | T
+    | {
+        ingredient?: T;
+        id?: T;
+      };
+  variants?:
+    | T
+    | {
+        variant?: T;
+        price?: T;
         id?: T;
       };
   averageRating?: T;
@@ -676,6 +746,7 @@ export interface BranchProductsSelect<T extends boolean = true> {
   branch?: T;
   product?: T;
   stockQuantity?: T;
+  adjustStock?: T;
   lowStockThreshold?: T;
   isAvailable?: T;
   updatedAt?: T;
