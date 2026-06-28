@@ -73,7 +73,6 @@ export interface Config {
     categories: Category;
     products: Product;
     'branch-products': BranchProduct;
-    addresses: Address;
     orders: Order;
     payments: Payment;
     deliveries: Delivery;
@@ -91,7 +90,6 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'branch-products': BranchProductsSelect<false> | BranchProductsSelect<true>;
-    addresses: AddressesSelect<false> | AddressesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     deliveries: DeliveriesSelect<false> | DeliveriesSelect<true>;
@@ -143,6 +141,19 @@ export interface User {
   id: number;
   name: string;
   phone?: string | null;
+  addresses?:
+    | {
+        recipientName: string;
+        phone: string;
+        addressLine1: string;
+        addressLine2?: string | null;
+        city: string;
+        area?: string | null;
+        postalCode?: string | null;
+        isDefault?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   role?: ('admin' | 'staff' | 'customer') | null;
   updatedAt: string;
   createdAt: string;
@@ -331,23 +342,6 @@ export interface BranchProduct {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses".
- */
-export interface Address {
-  id: number;
-  user: number | User;
-  recipientName: string;
-  phone: string;
-  addressLine1: string;
-  addressLine2?: string | null;
-  city: string;
-  area?: string | null;
-  postalCode?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
@@ -363,15 +357,17 @@ export interface Order {
   guestEmail?: string | null;
   guestName?: string | null;
   branch: number | Outlet;
-  shippingAddress: number | Address;
+  shippingAddress: {
+    recipientName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2?: string | null;
+    city: string;
+    area?: string | null;
+    postalCode?: string | null;
+  };
   orderStatus:
-    | 'pending'
-    | 'confirmed'
-    | 'preparing'
-    | 'out_for_delivery'
-    | 'ready_for_pickup'
-    | 'delivered'
-    | 'cancelled';
+    'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'ready_for_pickup' | 'delivered' | 'cancelled';
   orderType: 'delivery' | 'pickup';
   items: {
     product: number | Product;
@@ -503,10 +499,6 @@ export interface PayloadLockedDocument {
         value: number | BranchProduct;
       } | null)
     | ({
-        relationTo: 'addresses';
-        value: number | Address;
-      } | null)
-    | ({
         relationTo: 'orders';
         value: number | Order;
       } | null)
@@ -571,6 +563,19 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   phone?: T;
+  addresses?:
+    | T
+    | {
+        recipientName?: T;
+        phone?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        area?: T;
+        postalCode?: T;
+        isDefault?: T;
+        id?: T;
+      };
   role?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -754,22 +759,6 @@ export interface BranchProductsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses_select".
- */
-export interface AddressesSelect<T extends boolean = true> {
-  user?: T;
-  recipientName?: T;
-  phone?: T;
-  addressLine1?: T;
-  addressLine2?: T;
-  city?: T;
-  area?: T;
-  postalCode?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
@@ -778,7 +767,17 @@ export interface OrdersSelect<T extends boolean = true> {
   guestEmail?: T;
   guestName?: T;
   branch?: T;
-  shippingAddress?: T;
+  shippingAddress?:
+    | T
+    | {
+        recipientName?: T;
+        phone?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        area?: T;
+        postalCode?: T;
+      };
   orderStatus?: T;
   orderType?: T;
   items?:

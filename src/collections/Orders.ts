@@ -46,9 +46,17 @@ export const Orders: CollectionConfig = {
     { name: 'branch', type: 'relationship', relationTo: 'outlets', required: true },
     {
       name: 'shippingAddress',
-      type: 'relationship',
-      relationTo: 'addresses',
+      type: 'group',
       required: true,
+      fields: [
+        { name: 'recipientName', type: 'text', required: true },
+        { name: 'phone', type: 'text', required: true },
+        { name: 'addressLine1', type: 'text', required: true },
+        { name: 'addressLine2', type: 'text' },
+        { name: 'city', type: 'text', required: true },
+        { name: 'area', type: 'text' },
+        { name: 'postalCode', type: 'text' },
+      ],
     },
     {
       name: 'orderStatus',

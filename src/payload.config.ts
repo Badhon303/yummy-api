@@ -11,7 +11,6 @@ import { Outlets } from './collections/Outlets'
 import { Categories } from './collections/Categories'
 import { Products } from './collections/Products'
 import { BranchProducts } from './collections/BranchProducts'
-import { Addresses } from './collections/Addresses'
 import { Orders } from './collections/Orders'
 import { Payments } from './collections/Payments'
 import { Deliveries } from './collections/Deliveries'
@@ -81,7 +80,6 @@ export default buildConfig({
     Categories,
     Products,
     BranchProducts,
-    Addresses,
     Orders,
     Payments,
     Deliveries,
