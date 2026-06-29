@@ -1,0 +1,16 @@
+# Nixpacks configuration for Dokploy deployment.
+# Runs Payload database migrations before starting the production server so
+# that newly added collections (e.g. Payments, Deliveries) get their tables
+# created in the deployed database.
+
+[phases.setup]
+nixPkgs = ["nodejs_22", "pnpm"]
+
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["pnpm run build"]
+
+[start]
+cmd = "pnpm run migrate && pnpm run start"
