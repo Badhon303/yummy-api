@@ -74,5 +74,7 @@ ENV PORT 3000
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-# Run Payload migrations before starting the server
-CMD ["sh", "-c", "npx payload migrate && HOSTNAME=\"0.0.0.0\" node server.js"]
+# FIRST DEPLOY ONLY: migrate:fresh drops the dev-pushed schema and applies
+# migrations cleanly. After the first successful boot, switch back to:
+#   npx payload migrate --force-accept-warning
+CMD ["sh", "-c", "npx payload migrate:fresh --force-accept-warning && HOSTNAME=\"0.0.0.0\" node server.js"]

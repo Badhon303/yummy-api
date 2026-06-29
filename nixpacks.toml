@@ -12,5 +12,8 @@ cmds = ["pnpm install --frozen-lockfile"]
 [phases.build]
 cmds = ["pnpm run build"]
 
+# FIRST DEPLOY ONLY: migrate:fresh drops all tables (your DB still holds the
+# dev-pushed schema) and applies migrations cleanly. After the first successful
+# boot, change this back to:  pnpm run migrate && pnpm run start
 [start]
-cmd = "pnpm run migrate && pnpm run start"
+cmd = "pnpm run migrate:fresh && pnpm run start"
