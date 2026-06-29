@@ -367,7 +367,13 @@ export interface Order {
     postalCode?: string | null;
   };
   orderStatus:
-    'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'ready_for_pickup' | 'delivered' | 'cancelled';
+    | 'pending'
+    | 'confirmed'
+    | 'preparing'
+    | 'out_for_delivery'
+    | 'ready_for_pickup'
+    | 'delivered'
+    | 'cancelled';
   orderType: 'delivery' | 'pickup';
   items: {
     product: number | Product;
